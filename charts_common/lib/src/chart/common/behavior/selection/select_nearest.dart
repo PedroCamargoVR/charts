@@ -169,6 +169,7 @@ class SelectNearest<D> implements ChartBehavior<D> {
     final seriesList = <ImmutableSeries<D>>[];
     var seriesDatumList = <SeriesDatum<D>>[];
 
+    // ignore: unnecessary_null_comparison
     if (details != null && details.isNotEmpty) {
       details.sort((a, b) => a.domainDistance!.compareTo(b.domainDistance!));
 

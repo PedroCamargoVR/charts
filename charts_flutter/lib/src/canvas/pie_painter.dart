@@ -41,6 +41,7 @@ class PiePainter {
     // Draw stroke lines between pie slices. This is done after the slices are
     // drawn to ensure that they appear on top.
     if (canvasPie.stroke != null &&
+        // ignore: unnecessary_null_comparison
         canvasPie.strokeWidthPx != null &&
         canvasPie.slices.length > 1) {
       paint.color = new Color.fromARGB(canvasPie.stroke!.a, canvasPie.stroke!.r,

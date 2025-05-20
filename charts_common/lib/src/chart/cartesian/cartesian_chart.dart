@@ -407,6 +407,7 @@ abstract class CartesianChart<D> extends BaseChart<D> {
       axis.resetDomains();
     });
 
+    // ignore: unnecessary_null_comparison
     final reverseAxisDirection = context != null && context.isRtl;
 
     if (vertical) {

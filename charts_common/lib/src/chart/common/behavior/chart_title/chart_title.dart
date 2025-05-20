@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ignore_for_file: unnecessary_null_comparison
+
 import 'dart:math';
 
 import '../../../../common/graphics_factory.dart' show GraphicsFactory;

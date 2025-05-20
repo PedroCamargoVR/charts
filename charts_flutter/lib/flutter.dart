@@ -121,6 +121,7 @@ export 'package:charts_common/common.dart'
         PointRendererDecorator,
         PointRendererElement,
         PointSymbolRenderer,
+        // ignore: undefined_shown_name
         QuantumPalette,
         RangeAnnotationAxisType,
         RangeAnnotationSegment,

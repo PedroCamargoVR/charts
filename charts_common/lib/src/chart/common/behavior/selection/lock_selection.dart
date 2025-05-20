@@ -69,6 +69,7 @@ class LockSelection<D> implements ChartBehavior<D> {
     final selectionModel = _chart!.getSelectionModel(selectionModelType);
 
     // Do nothing if the chart has no selection model.
+    // ignore: unnecessary_null_comparison
     if (selectionModel == null) {
       return false;
     }

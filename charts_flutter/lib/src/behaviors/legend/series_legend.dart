@@ -337,7 +337,7 @@ class _FlutterSeriesLegend<D> extends common.SeriesLegend<D>
 
   @override
   Widget build(BuildContext context) {
-    final hasSelection = legendState.legendEntries != null &&
+    final hasSelection =
         legendState.legendEntries.any((entry) => entry.isSelected);
 
     // Show measures if [showMeasures] is true and there is a selection or if

@@ -47,6 +47,7 @@ class SunburstChart<D> extends BaseChart<D> {
       final details = (renderer as SunburstArcRenderer<D>)
           .getExpandedDatumDetails(seriesDatum);
 
+      // ignore: unnecessary_null_comparison
       if (details != null) {
         entries.add(details);
       }

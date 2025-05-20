@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ignore_for_file: unused_local_variable
+
 import 'package:charts_common/common.dart';
 import 'package:test/test.dart';
 import 'package:charts_common/src/data/graph_utils.dart';

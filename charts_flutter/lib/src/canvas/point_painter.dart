@@ -29,6 +29,7 @@ class PointPainter {
       common.Color? fill,
       common.Color? stroke,
       double? strokeWidthPx}) {
+    // ignore: unnecessary_null_comparison
     if (point == null) {
       return;
     }

@@ -191,6 +191,7 @@ class LinePointHighlighter<D> implements ChartBehavior<D> {
     final newSeriesMap = LinkedHashMap<String, _AnimatedPoint<D>>();
 
     for (final detail in selectedDatumDetails) {
+      // ignore: unnecessary_null_comparison
       if (detail == null) {
         continue;
       }

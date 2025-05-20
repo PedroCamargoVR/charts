@@ -78,6 +78,7 @@ class AutoAdjustingDateTimeTickProvider implements TickProvider<DateTime> {
   /// and this list of tick providers are used in the order they are provided.
   factory AutoAdjustingDateTimeTickProvider.createWith(
       List<TimeRangeTickProvider> potentialTickProviders) {
+    // ignore: unnecessary_null_comparison
     if (potentialTickProviders == null || potentialTickProviders.isEmpty) {
       throw ArgumentError('At least one TimeRangeTickProvider is required');
     }

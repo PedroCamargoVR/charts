@@ -126,6 +126,7 @@ class DateTimeTickFormatter implements TickFormatter<DateTime> {
   factory DateTimeTickFormatter.withFormatters(
       Map<int, TimeTickFormatter> formatters) {
     // Formatters must be non empty.
+    // ignore: unnecessary_null_comparison
     if (formatters == null || formatters.isEmpty) {
       throw ArgumentError('At least one TimeTickFormatter is required.');
     }

@@ -1,5 +1,3 @@
-// @dart=2.9
-
 // Copyright 2018 the Charts project authors. Please see the AUTHORS file
 // for details.
 //
@@ -41,11 +39,12 @@ import 'package:charts_common/src/chart/bar/bar_label_decorator.dart'
         BarLabelPosition,
         BarLabelVerticalPosition;
 import 'package:charts_common/src/data/series.dart' show AccessorFn;
+import 'package:mockito/annotations.dart';
 
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-class MockCanvas extends Mock implements ChartCanvas {}
+import 'bar_label_decorator_test.mocks.dart';
 
 /// A fake [GraphicsFactory] that returns [FakeTextStyle] and [FakeTextElement].
 class FakeGraphicsFactory extends GraphicsFactory {
@@ -53,7 +52,8 @@ class FakeGraphicsFactory extends GraphicsFactory {
   TextStyle createTextPaint() => FakeTextStyle();
 
   @override
-  TextElement createTextElement(String text) => FakeTextElement(text);
+  TextElement createTextElement(String text) =>
+      FakeTextElement(text, textStyle: FakeTextStyle());
 
   @override
   LineStyle createLinePaint() => MockLinePaint();
@@ -61,50 +61,135 @@ class FakeGraphicsFactory extends GraphicsFactory {
 
 /// Stores [TextStyle] properties for test to verify.
 class FakeTextStyle implements TextStyle {
-  @override
-  Color color;
+  FakeTextStyle({
+    this.color = const Color(r: 0, g: 0, b: 0),
+    this.fontSize = 12,
+    this.fontFamily = 'Arial',
+    this.fontWeight = '12',
+    this.lineHeight = 12.0,
+  });
 
   @override
-  int fontSize;
+  final Color color;
 
   @override
-  String fontFamily;
+  final int fontSize;
 
   @override
-  double lineHeight;
+  final String fontFamily;
 
   @override
-  String fontWeight;
+  final String fontWeight;
+
+  @override
+  final double lineHeight;
+
+  @override
+  set color(Color? value) {
+    // not implemented
+  }
+
+  @override
+  set fontFamily(String? fontFamily) {
+    // not implemented
+  }
+
+  @override
+  set fontSize(int? value) {
+    // not implemented
+  }
+
+  @override
+  set fontWeight(String? value) {
+    // not implemented
+  }
+
+  @override
+  set lineHeight(double? value) {
+    // not implemented
+  }
 }
 
 /// Fake [TextElement] which returns text length as [horizontalSliceWidth].
 ///
 /// Font size is returned for [verticalSliceWidth] and [baseline].
-class FakeTextElement implements TextElement {
-  @override
-  final String text;
+class FakeTextElement extends TextElement {
+  final String _text;
 
   @override
-  TextStyle textStyle;
+  final TextStyle textStyle;
 
   @override
-  int maxWidth;
+  final int maxWidth;
 
   @override
-  MaxWidthStrategy maxWidthStrategy;
+  final MaxWidthStrategy maxWidthStrategy;
 
   @override
-  TextDirection textDirection;
+  final TextDirection textDirection;
 
-  double opacity;
+  FakeTextElement(
+    this._text, {
+    required this.textStyle,
+    this.maxWidth = 9999,
+    this.maxWidthStrategy = MaxWidthStrategy.ellipsize,
+    this.textDirection = TextDirection.ltr,
+  });
 
-  FakeTextElement(this.text);
+  @override
+  String get text {
+    if (maxWidthStrategy == MaxWidthStrategy.ellipsize) {
+      var width = measureTextWidth(_text);
+      var ellipsis = '...';
+      var ellipsisWidth = measureTextWidth(ellipsis);
+      if (width <= maxWidth || width <= ellipsisWidth) {
+        return _text;
+      } else {
+        var len = _text.length;
+        var ellipsizedText = _text;
+        while (width >= maxWidth - ellipsisWidth && len-- > 0) {
+          ellipsizedText = ellipsizedText.substring(0, len);
+          width = measureTextWidth(ellipsizedText);
+        }
+        return ellipsizedText + ellipsis;
+      }
+    }
+    return _text;
+  }
 
   @override
   TextMeasurement get measurement => TextMeasurement(
-      horizontalSliceWidth: text.length.toDouble(),
-      verticalSliceWidth: textStyle.fontSize.toDouble(),
-      baseline: textStyle.fontSize.toDouble());
+        horizontalSliceWidth: _text.length.toDouble(),
+        verticalSliceWidth: textStyle.fontSize?.toDouble() ?? 0.0,
+        baseline: textStyle.fontSize?.toDouble() ?? 0.0,
+      );
+
+  double measureTextWidth(String text) => text.length.toDouble();
+
+  @override
+  set maxWidth(int? value) {
+    // not implemented
+  }
+
+  @override
+  set maxWidthStrategy(MaxWidthStrategy? maxWidthStrategy) {
+    // not implemented
+  }
+
+  @override
+  set opacity(double? opacity) {
+    // not implemented
+  }
+
+  @override
+  set textDirection(TextDirection direction) {
+    // not implemented
+  }
+
+  @override
+  set textStyle(TextStyle? value) {
+    // not implemented
+  }
 }
 
 class MockLinePaint extends Mock implements LineStyle {}
@@ -112,7 +197,7 @@ class MockLinePaint extends Mock implements LineStyle {}
 class FakeBarRendererElement implements ImmutableBarRendererElement<String> {
   final _series = MockImmutableSeries<String>();
   final AccessorFn<String> labelAccessor;
-  final AccessorFn<num> measureFn;
+  final AccessorFn<num>? measureFn;
   final List<String> data;
 
   @override
@@ -122,11 +207,11 @@ class FakeBarRendererElement implements ImmutableBarRendererElement<String> {
   final Rectangle<int> bounds;
 
   @override
-  int index;
+  late int index;
 
   FakeBarRendererElement(this.datum, this.bounds, this.labelAccessor, this.data,
-      {this.measureFn}) {
-    index = data.indexOf(datum);
+      {this.measureFn, int? index}) {
+    this.index = index ?? data.indexOf(datum);
     when(_series.labelAccessorFn).thenReturn(labelAccessor);
     when(_series.measureFn).thenReturn(measureFn ?? (_) => 1.0);
     when(_series.data).thenReturn(data);
@@ -138,13 +223,14 @@ class FakeBarRendererElement implements ImmutableBarRendererElement<String> {
 
 class MockImmutableSeries<D> extends Mock implements ImmutableSeries<D> {}
 
+@GenerateMocks([ChartCanvas])
 void main() {
-  ChartCanvas canvas;
-  GraphicsFactory graphicsFactory;
-  Rectangle<int> drawBounds;
+  late MockChartCanvas canvas;
+  late GraphicsFactory graphicsFactory;
+  late Rectangle<int> drawBounds;
 
   setUpAll(() {
-    canvas = MockCanvas();
+    canvas = MockChartCanvas();
     graphicsFactory = FakeGraphicsFactory();
     drawBounds = Rectangle(0, 0, 200, 100);
   });
@@ -191,8 +277,7 @@ void main() {
           animationPercent: 1.0,
           renderingVertically: true);
 
-      final captured =
-          verify(canvas.drawText(captureAny, captureAny, captureAny)).captured;
+      final captured = verify(canvas.drawText(any, any, any)).captured;
       // Draw text is called three times (once for each bar) and all 3
       // parameters were captured. Total parameters captured expected to be 9.
       expect(captured, hasLength(9));
@@ -370,7 +455,7 @@ void main() {
     group('Null and empty label scenarios', () {
       test('Skip label if label accessor does not exist', () {
         final barElements = [
-          FakeBarRendererElement('A', Rectangle(0, 0, 10, 20), null, ['A'])
+          FakeBarRendererElement('A', Rectangle(0, 0, 10, 20), (a) => "", ['A'])
         ];
 
         BarLabelDecorator<String>().decorate(
@@ -385,7 +470,7 @@ void main() {
       test('Skip label if label is null or empty', () {
         final data = ['A', 'B'];
         final barElements = [
-          FakeBarRendererElement('A', Rectangle(0, 0, 10, 20), null, data),
+          FakeBarRendererElement('A', Rectangle(0, 0, 10, 20), (a) => "", data),
           FakeBarRendererElement(
               'B', Rectangle(0, 50, 10, 20), (_) => '', data),
         ];
@@ -543,15 +628,23 @@ void main() {
       expect(captured[0].maxWidth, equals(50 - decorator.labelPadding * 2));
       expect(captured[0].textDirection, equals(TextDirection.ltr));
       expect(captured[1], equals(decorator.labelPadding));
-      expect(captured[2],
-          equals(30 - decorator.insideLabelStyleSpec.fontSize ~/ 2));
+      expect(
+          captured[2],
+          equals(30 -
+              (decorator.insideLabelStyleSpec.fontSize != null
+                  ? decorator.insideLabelStyleSpec.fontSize! ~/ 2
+                  : 0)));
       // For bar 'B'.
       expect(
           captured[3].maxWidth, equals(200 - 5 - decorator.labelPadding * 2));
       expect(captured[3].textDirection, equals(TextDirection.ltr));
       expect(captured[4], equals(5 + decorator.labelPadding));
-      expect(captured[5],
-          equals(80 - decorator.outsideLabelStyleSpec.fontSize ~/ 2));
+      expect(
+          captured[5],
+          equals(80 -
+              (decorator.insideLabelStyleSpec.fontSize != null
+                  ? decorator.insideLabelStyleSpec.fontSize! ~/ 2
+                  : 0)));
     });
 
     test('LabelPosition.auto paints inside bar if outside bar has less width',
@@ -830,7 +923,8 @@ void main() {
     group('Null and empty label scenarios', () {
       test('Skip label if label accessor does not exist', () {
         final barElements = [
-          FakeBarRendererElement('A', Rectangle(0, 0, 10, 20), null, ['A']),
+          FakeBarRendererElement(
+              'A', Rectangle(0, 0, 10, 20), (a) => "", ['A']),
         ];
 
         BarLabelDecorator<String>().decorate(
@@ -845,7 +939,7 @@ void main() {
       test('Skip label if label is null or empty', () {
         final data = ['A', 'B'];
         final barElements = [
-          FakeBarRendererElement('A', Rectangle(0, 0, 10, 20), null, data),
+          FakeBarRendererElement('A', Rectangle(0, 0, 10, 20), (a) => "", data),
           FakeBarRendererElement(
               'B', Rectangle(0, 50, 10, 20), (_) => '', data),
         ];

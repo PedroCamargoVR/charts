@@ -610,6 +610,7 @@ class PointRenderer<D> extends BaseCartesianRenderer<D> {
           Vector2(datumPoint.xUpper!, datumPoint.yUpper!));
 
       insidePoint = (relativeDistance < radiusPx) ||
+          // ignore: unnecessary_null_comparison
           (boundsLineRadiusPx != null &&
               // This may be inaccurate if the symbol is drawn without end caps.
               relativeDistanceBounds < boundsLineRadiusPx);

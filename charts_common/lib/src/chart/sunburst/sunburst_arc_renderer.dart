@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// ignore_for_file: unused_local_variable
+
 import 'dart:collection' show LinkedHashMap, HashSet;
 import 'dart:math' show max, min, pi, Point;
 
@@ -431,6 +433,7 @@ class SunburstArcRenderer<D> extends BaseArcRenderer<D> {
 
   // Records the nodes to expand beyond initial display level.
   void expandNode(TreeNode<D> node) {
+    // ignore: unnecessary_null_comparison
     if (node == null) {
       _nodeToExpand.clear();
     } else if (node.hasChildren) {

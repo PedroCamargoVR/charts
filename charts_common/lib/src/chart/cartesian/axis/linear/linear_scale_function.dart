@@ -156,6 +156,7 @@ class LinearScaleFunction {
         case StepSizeType.autoDetect:
           final minimumDetectedDomainStep =
               domainInfo.minimumDetectedDomainStep.toDouble();
+          // ignore: unnecessary_null_comparison
           if (minimumDetectedDomainStep != null &&
               minimumDetectedDomainStep.isFinite) {
             scalingFactor = viewportSettings.scalingFactor *
