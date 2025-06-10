@@ -58,12 +58,16 @@ class ChartContainer<D> extends CustomPaint {
 
   @override
   RenderCustomPaint createRenderObject(BuildContext context) {
-    return new ChartContainerRenderObject<D>()..reconfigure(this, context);
+    final renderObject = ChartContainerRenderObject<D>();
+    renderObject.reconfigure(this, context);
+    return renderObject;
   }
 
   @override
   void updateRenderObject(
-      BuildContext context, ChartContainerRenderObject renderObject) {
+    BuildContext context,
+    ChartContainerRenderObject renderObject,
+  ) {
     renderObject.reconfigure(this, context);
   }
 }
@@ -165,6 +169,11 @@ class ChartContainerRenderObject<D> extends RenderCustomPaint
 
   @override
   void performLayout() {
+    if (_chart == null) {
+      size = constraints.biggest;
+      return;
+    }
+
     common.Performance.time('chartsLayout');
     _chart!
         .measure(constraints.maxWidth.toInt(), constraints.maxHeight.toInt());
@@ -206,7 +215,8 @@ class ChartContainerRenderObject<D> extends RenderCustomPaint
       _ambiguate(SchedulerBinding.instance)!.scheduleFrame();
     }
 
-    _ambiguate(SchedulerBinding.instance)!.addPostFrameCallback(startAnimationController);
+    _ambiguate(SchedulerBinding.instance)!
+        .addPostFrameCallback(startAnimationController);
   }
 
   /// Request Flutter to rebuild the widget/container of chart.
